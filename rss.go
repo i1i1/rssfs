@@ -48,15 +48,20 @@ func getInode(data []byte) uint64 {
 	return h.Sum64()
 }
 
-func getFeedData(url string) *gofeed.Feed {
+func getFeedData(url string) (*gofeed.Feed, error) {
 	feeddata, err := gofeed.NewParser().ParseURL(url)
-	die(err)
+	if err != nil {
+		return nil, err
+	}
 	sort.Sort(ByTitle(feeddata.Items))
-	return feeddata
+	return feeddata, nil
 }
 
-func GetFeedFiles(f *FeedNode) []NewsNode {
-	feeddata := getFeedData(f.URL)
+func GetFeedFiles(f *FeedNode) ([]NewsNode, error) {
+	feeddata, err := getFeedData(f.URL)
+	if err != nil {
+		return []NewsNode{}, err
+	}
 	feedFiles := make([]NewsNode, 0)
 
 	// Checking collisions
@@ -88,7 +93,7 @@ func GetFeedFiles(f *FeedNode) []NewsNode {
 		})
 	}
 
-	return feedFiles
+	return feedFiles, nil
 }
 
 func GenerateOutputData(it *gofeed.Item) (ext string, content string) {

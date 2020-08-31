@@ -118,7 +118,7 @@ func (fn *FeedNode) readdir() []node {
 	fn.News = &sync.Map{}
 	ret := make([]node, 0)
 
-	feeds := GetFeedFiles(fn)
+	feeds, _ := GetFeedFiles(fn)
 	for i := 0; i < len(feeds); i++ {
 		fn.News.Store(feeds[i].Filename, &feeds[i])
 		ret = append(ret, &feeds[i])
@@ -246,7 +246,8 @@ func (c *CategoryNode) Opendir(ctx context.Context) syscall.Errno { return fs.OK
 func (_ *RootNode) Opendir(ctx context.Context) syscall.Errno     { return fs.OK }
 
 func getFeedNode(f *Feed) (fn FeedNode) {
-	feeddata := getFeedData(f.URL)
+	feeddata, err := getFeedData(f.URL)
+	die(err)
 	return FeedNode{
 		GenericNode{
 			Timestamp: time.Now(),
