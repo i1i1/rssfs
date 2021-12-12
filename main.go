@@ -32,6 +32,10 @@ func ConfigFilePath() string {
 	} else {
 		path = os.Getenv("XDG_CONFIG_HOME")
 	}
+	if path == "" {
+		path = fmt.Sprintf("%s/.config/", os.Getenv("HOME"))
+	}
+
 	return fmt.Sprintf("%s/rssfs.hcl", path)
 }
 
